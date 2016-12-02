@@ -742,7 +742,6 @@ Ebk.MatVectUtils.prototype.vect                                      = function(
 Ebk.MatVectUtils.prototype.vectThreeDSum                             = function(v1,v2) {
     //var result = [v1[0]+v2[0],v1[1]+v2[1],v1[2]+v2[2]];
     //return  result;
-
     var result = [];
     for(var indDim =0; indDim< v1.length;indDim++) {
         result.push(v1[indDim]+v2[indDim]);
@@ -848,13 +847,29 @@ Ebk.MatVectUtils.prototype.dotProduct                                = function(
 }
 
 // renvoie le produit scalaire entre deux vecteurs
-Ebk.MatVectUtils.prototype.determinantR2                            = function(v1,v2) {
-
+Ebk.MatVectUtils.prototype.determinantR2                             = function(v1,v2) {
      return v1[0]*v2[1] - v1[1]*v2[0];
 
-
-
 }
+
+
+//Renvoie deux points resultant de deux points données transformés par changement d'échelle à partir des facteurs donnés
+Ebk.MatVectUtils.prototype.twoVerticesR3_Scale                       = function(verticesMx,scaleFactorMx) {
+
+   var forthVector      = this.vect(verticesMx[0],verticesMx[1]).slice();
+   var forthFactVector  = this.vectThreeDScaProd (scaleFactorMx[0],forthVector).slice();
+   var forthFactVertex  = this.vectThreeDSum(verticesMx[0],forthFactVector).slice();
+   // console.log(forthVector,forthFactVector,forthFactVertex);
+
+   var backVector      = this.vect(verticesMx[1],verticesMx[0]).slice();
+   var backFactVector  = this.vectThreeDScaProd (scaleFactorMx[1],backVector).slice();
+   var backFactVertex  = this.vectThreeDSum(verticesMx[1],backFactVector).slice();
+
+
+   return  [forthFactVertex,backFactVertex];
+};
+
+
 
 
 // renvoie le vecteur correspondant à la surperposition(multiplication) d'un scalaire à un vecteur
