@@ -113,6 +113,11 @@ Ebk.Utilities.prototype.round                                        = function 
 
 };
 
+//renvoie le logarithme de y en base x (c'est-à-dire logx y):
+Ebk.Utilities.prototype.getBaseLog                                   = function (x, y) {
+    return Math.log(y) / Math.log(x);
+}
+
 //Détermine la distance entre 2 points
 Ebk.Utilities.prototype.distance                                     = function(A,B) {
 
@@ -742,7 +747,6 @@ Ebk.MatVectUtils.prototype.vect                                      = function(
 Ebk.MatVectUtils.prototype.vectThreeDSum                             = function(v1,v2) {
     //var result = [v1[0]+v2[0],v1[1]+v2[1],v1[2]+v2[2]];
     //return  result;
-
     var result = [];
     for(var indDim =0; indDim< v1.length;indDim++) {
         result.push(v1[indDim]+v2[indDim]);
@@ -848,13 +852,24 @@ Ebk.MatVectUtils.prototype.dotProduct                                = function(
 }
 
 // renvoie le produit scalaire entre deux vecteurs
-Ebk.MatVectUtils.prototype.determinantR2                            = function(v1,v2) {
-
+Ebk.MatVectUtils.prototype.determinantR2                             = function(v1,v2) {
      return v1[0]*v2[1] - v1[1]*v2[0];
 
-
-
 }
+
+
+//Renvoie deux points resultant de deux points données transformés par changement d'échelle à partir des facteurs donnés
+Ebk.MatVectUtils.prototype.twoVerticesR3_Scale                       = function(verticesMx,scaleFactorMx) {
+
+   var forthVector      = this.vect(verticesMx[0],verticesMx[1]).slice();
+   var forthFactVector  = this.vectThreeDScaProd (scaleFactorMx[0],forthVector).slice();
+   var forthFactVertex  = this.vectThreeDSum(verticesMx[0],forthFactVector).slice();
+
+   var backVector       = this.vect(verticesMx[1],verticesMx[0]).slice();
+   var backFactVector   = this.vectThreeDScaProd (scaleFactorMx[1],backVector).slice();
+   var backFactVertex   = this.vectThreeDSum(verticesMx[1],backFactVector).slice();
+   return  [forthFactVertex,backFactVertex];
+};
 
 
 // renvoie le vecteur correspondant à la surperposition(multiplication) d'un scalaire à un vecteur
@@ -1918,6 +1933,43 @@ Ebk.Transition.prototype.trstGetStep                                 = function(
 
     return result;
 }
+
+//revoie l'indice de transition sachant la transition
+Ebk.Transition.prototype.trstGetStepIndex                            = function(step_transition,step_count,interval_size,tFact) {
+    var result
+
+    if (tFact !=0) {
+
+        result = this.getBaseLog(1+tFact, 1- (step_transition*(1- Math.pow((1+tFact),step_count+1)))/interval_size) - 1;
+
+    }
+    else {
+        var interval_sub_size = interval_size/step_count;
+        result = step_transition/interval_sub_size;
+    };
+
+
+    return result;
+};
+
+//revoie l'indice de tramsition sachant la transition
+Ebk.Transition.prototype.trstTest                          = function() {
+
+    var step_count = 10 ,interval_size= 1000,tFact= 0.5;
+
+    for (var i =0;i<=step_count;i++) {
+
+        var  result   = this.trstGetStep(i,step_count,interval_size,tFact);
+        var  result1 = this.trstGetStepIndex(result,step_count,interval_size,tFact);
+        console.log(i,result,result1);
+
+        result1 = this.trstGetStepIndex(result,10,1000,0.5);
+    }
+
+}
+
+
+
 
 
 //revoie une  transition sur un intervalle donneé
